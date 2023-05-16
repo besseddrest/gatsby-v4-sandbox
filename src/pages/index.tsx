@@ -1,5 +1,6 @@
 import * as React from "react"
 import type { HeadFC, PageProps } from "gatsby"
+const contentful = require('contentful')
 
 const pageStyles = {
   color: "#232129",
@@ -136,14 +137,30 @@ const links = [
   },
 ]
 
+interface BasicInterface {
+  title: string;
+  body: string;
+}
+
 const IndexPage: React.FC<PageProps> = () => {
+  const [ pageData, setPageData ] = React.useState<BasicInterface>({ title: '', body: ''});
+
+  React.useEffect(() => {
+    const client = contentful.createClient({
+      space: 'wzo5qweyairv',
+      environment: 'master', // defaults to 'master' if not set
+      accessToken: 'lYq8Y-MB8_UPoZ8h95kgI6s5A_G8NpNBfRRFKFkrECY'
+    })
+    
+    client.getEntry('6MEvEHNABeHyACC93EfGOo')
+    .then((entry) => setPageData(entry.fields))
+    .catch(console.error)
+
+  }, []);
   return (
     <main style={pageStyles}>
-      <h1 style={headingStyles}>
-        Congratulations
-        <br />
-        <span style={headingAccentStyles}>— you just made a Gatsby site! 🎉🎉🎉</span>
-      </h1>
+      <h1 style={headingStyles}>{ pageData.title }</h1>
+      <p>{ pageData.body }</p>
       <p style={paragraphStyles}>
         Edit <code style={codeStyles}>src/pages/index.tsx</code> to see this page
         update in real-time. 😎
